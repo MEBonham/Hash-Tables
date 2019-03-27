@@ -122,6 +122,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+  Pair *incumbent_pair = *(ht->storage + index);
+  if (!strcmp(key, incumbent_pair->key))
+  {
+    return incumbent_pair->value;
+  }
   return NULL;
 }
 
