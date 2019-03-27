@@ -107,7 +107,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int index = hash(key, ht->capacity);
+  Pair *incumbent_pair = *(ht->storage + index);
+  if (!strcmp(key, incumbent_pair->key))
+  {
+    destroy_pair(*(ht->storage + index));
+  }
 }
 
 /****
