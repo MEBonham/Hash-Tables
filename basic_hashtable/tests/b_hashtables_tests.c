@@ -1,5 +1,5 @@
-#include <b_hashtables.h>
-#include "../utils/minunit.h"
+#include "../b_hashtables.h"
+#include "../../utils/minunit.h"
 
 char *basic_hash_table_test()
 {
