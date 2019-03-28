@@ -91,7 +91,36 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  if (*(ht->storage + index))     // this hash bucket already has at least one LinkedPair
+  {
+    // Check whether key already exists in linked list; update it if so
+    LinkedPair *current_node = *(ht->storage + index);
+    int found = 0;
+    while (current_node->next != NULL)
+    {
+      if (!strcmp(key, current_node->key))
+      {
+        current_node->value = value;
+        found = 1;
+        break;
+      }
+      else
+      {
+        current_node = current_node->next;
+      }
+    }
+    // If key was not found, add it to the start of the linked list
+    LinkedPair *lp = create_pair(key, value);
+    lp->next = *(ht->storage + index);
+    *(ht->storage + index) = lp;
+  }
+  else        // hash bucket is empty or NULL
+  {
+    LinkedPair *lp = create_pair(key, value);
+    *(ht->storage + index) = lp;
+  }
 }
 
 /*
@@ -104,7 +133,44 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+  int found = 0;
 
+  if (*(ht->storage + index))
+  {
+    LinkedPair *current_node = *(ht->storage + index);
+
+    // Delete the first node(s) if they match the key
+    while (current_node && !strcmp(key, current_node->key))
+    {
+      found = 1;
+      LinkedPair *second_node = current_node->next;
+      destroy_pair(current_node);
+      current_node = second_node;
+    }
+    *(ht->storage + index) = current_node;
+
+    // Then, delete any subsequent nodes that match the key
+    while (current_node && current_node->next != NULL)
+    {
+      if (current_node->next && !strcmp(key, current_node->next->key))
+      {
+        found = 1;
+        LinkedPair *next_node = current_node->next->next;
+        destroy_pair(current_node->next);
+        current_node->next = next_node;
+        current_node = current_node->next;
+      }
+      else
+      {
+        current_node = current_node->next;
+      }
+    }
+  }
+  if (!found)
+  {
+    fprintf(stderr, "Key %s not found in hash table to be deleted.", key);
+  }
 }
 
 /*
