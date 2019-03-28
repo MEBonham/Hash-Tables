@@ -232,8 +232,18 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
 
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    LinkedPair *current_node = *(ht->storage + i);
+    while (current_node)
+    {
+      hash_table_insert(new_ht, current_node->key, current_node->value);
+      current_node = current_node->next;
+    }
+  }
+  destroy_hash_table(ht);
   return new_ht;
 }
 
