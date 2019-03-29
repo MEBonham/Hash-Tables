@@ -112,9 +112,12 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       }
     }
     // If key was not found, add it to the start of the linked list
-    LinkedPair *lp = create_pair(key, value);
-    lp->next = *(ht->storage + index);
-    *(ht->storage + index) = lp;
+    if (!found)
+    {
+      LinkedPair *lp = create_pair(key, value);
+      lp->next = *(ht->storage + index);
+      *(ht->storage + index) = lp;
+    }
   }
   else        // hash bucket is empty or NULL
   {
